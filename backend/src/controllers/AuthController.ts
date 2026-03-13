@@ -3,6 +3,18 @@ import { AuthService } from '../services/AuthService'
 import { validateEmail, validatePassword, validateUsername } from '../utils/validators'
 import { AppError } from '../utils/errors'
 
+
+declare module 'express-serve-static-core' {
+  interface Request {
+    userId?: string
+    user?: {
+      id?: string
+      email?: string
+      username?: string
+    }
+  }
+}
+
 export class AuthController {
   private authService: AuthService
 
@@ -14,6 +26,7 @@ export class AuthController {
     try {
       const { username, email, password } = req.body
 
+      // Validações
       if (!username || !email || !password) {
         throw new AppError('Todos os campos são obrigatórios', 400)
       }
@@ -30,7 +43,12 @@ export class AuthController {
         throw new AppError('Senha deve ter no mínimo 6 caracteres', 400)
       }
 
-      const result = await this.authService.register({ username, email, password })
+      const result = await this.authService.register({ 
+        username: String(username), 
+        email: String(email), 
+        password: String(password) 
+      })
+      
       res.status(201).json(result)
     } catch (error) {
       next(error)
@@ -45,7 +63,11 @@ export class AuthController {
         throw new AppError('Email e senha são obrigatórios', 400)
       }
 
-      const result = await this.authService.login({ email, password })
+      const result = await this.authService.login({ 
+        email: String(email), 
+        password: String(password) 
+      })
+      
       res.json(result)
     } catch (error) {
       next(error)
@@ -54,6 +76,11 @@ export class AuthController {
 
   me = async (req: Request, res: Response, next: NextFunction) => {
     try {
+      // Verificar se o usuário está autenticado
+      if (!req.user) {
+        throw new AppError('Usuário não autenticado', 401)
+      }
+
       res.json({ user: req.user })
     } catch (error) {
       next(error)

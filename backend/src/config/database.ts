@@ -1,36 +1,11 @@
-import { PrismaClient } from '@prisma/client'
+import "dotenv/config";
+import { PrismaClient } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 
-class Database {
-  private static instance: Database
-  public prisma: PrismaClient
+const adapter = new PrismaPg({
+  connectionString: process.env.DATABASE_URL!,
+});
 
-  private constructor() {
-    this.prisma = new PrismaClient({
-      log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
-    })
-  }
+const prisma = new PrismaClient({ adapter });
 
-  public static getInstance(): Database {
-    if (!Database.instance) {
-      Database.instance = new Database()
-    }
-    return Database.instance
-  }
-
-  async connect(): Promise<void> {
-    try {
-      await this.prisma.$connect()
-      console.log('📦 Banco de dados conectado com sucesso')
-    } catch (error) {
-      console.error('Erro ao conectar ao banco de dados:', error)
-      process.exit(1)
-    }
-  }
-
-  async disconnect(): Promise<void> {
-    await this.prisma.$disconnect()
-    console.log('📦 Conexão com banco de dados fechada')
-  }
-}
-
-export default Database.getInstance()
+export default prisma;

@@ -28,7 +28,12 @@ export const authMiddleware = async (
     const user = await authService.getUserById(decoded.id)
 
     req.userId = user.id
-    req.user = user
+    req.user = {
+      id: user.id,
+      email: user.email,
+      username: user.username
+    }
+    
     next()
   } catch (error) {
     res.status(401).json({ error: 'Por favor, autentique-se' })

@@ -21,7 +21,7 @@ app.use(errorHandler)
 
 async function bootstrap() {
   try {
-    await database.connect()
+    await database.$connect()
 
     app.listen(port, () => {
       console.log(`🚀 Servidor rodando em http://localhost:${port}`)
@@ -36,11 +36,11 @@ async function bootstrap() {
 bootstrap()
 
 process.on('SIGINT', async () => {
-  await database.disconnect()
+  await database.$disconnect()
   process.exit(0)
 })
 
 process.on('SIGTERM', async () => {
-  await database.disconnect()
+  await database.$disconnect()
   process.exit(0)
 })

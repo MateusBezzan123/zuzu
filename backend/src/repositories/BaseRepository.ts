@@ -5,6 +5,6 @@ export abstract class BaseRepository {
   protected prisma: PrismaClient
 
   constructor() {
-    this.prisma = database.prisma
+    this.prisma = database
   }
 }
