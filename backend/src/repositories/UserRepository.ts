@@ -1,6 +1,8 @@
 import { BaseRepository } from './BaseRepository'
 import { User, Prisma } from '@prisma/client'
 
+export type PublicUser = Omit<User, 'password'>
+
 export class UserRepository extends BaseRepository {
   async create(data: Prisma.UserCreateInput): Promise<User> {
     return this.prisma.user.create({
@@ -31,8 +33,8 @@ export class UserRepository extends BaseRepository {
     })
   }
 
-  async findById(id: string): Promise<User | null> {
-    return this.prisma.user.findUnique({
+  async findById(id: string): Promise<PublicUser | null> {
+    const user = await this.prisma.user.findUnique({
       where: { id },
       select: {
         id: true,
@@ -41,6 +43,13 @@ export class UserRepository extends BaseRepository {
         createdAt: true,
         updatedAt: true
       }
+    })
+    return user
+  }
+
+  async findByIdWithPassword(id: string): Promise<User | null> {
+    return this.prisma.user.findUnique({
+      where: { id }
     })
   }
 
