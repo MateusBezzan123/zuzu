@@ -1,0 +1,10 @@
+import { Router } from 'express'
+import { authRouter } from './auth.routes'
+import { productRouter } from './product.routes'
+
+const routes = Router()
+
+routes.use('/auth', authRouter)
+routes.use('/products', productRouter)
+
+export default routes
